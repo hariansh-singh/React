@@ -1,5 +1,4 @@
-import React, { useId } from 'react'
-
+import React, { useId } from 'react';
 
 function InputBox({
     label,
@@ -10,11 +9,9 @@ function InputBox({
     selectedCurrency = "usd",
     amountDisabled = false,
     currencyDisabled = false,
-
     className = "",
-
 }) {
-    const amountInputId = useId()
+    const amountInputId = useId();
 
     return (
         <div className={`bg-white p-3 rounded-lg text-sm flex ${className}`}>
@@ -30,7 +27,6 @@ function InputBox({
                     disabled={amountDisabled}
                     value={amount}
                     onChange={e => onAmountChange && onAmountChange(Number(e.target.value))}
-
                 />
             </div>
             <div className="w-1/2 flex flex-wrap justify-end text-right">
@@ -46,7 +42,6 @@ function InputBox({
                             {currency}
                         </option>
                     ))}
-
                 </select>
             </div>
         </div>
