@@ -1,67 +1,82 @@
-import { useState, useEffect } from 'react'
-import { TodoProvider } from './contexts/TodoContext'
-import './App.css'
-import TodoForm from './components/TodoForm'
-import TodoItem from './components/TodoItem'
+import React, { useState, useEffect } from 'react';
+import { TodoProvider } from './contexts/TodoContext';
+import { ThemeProvider } from './contexts/ThemeMode';
+import TodoForm from './components/TodoForm';
+import TodoItem from './components/TodoItem';
+import ThemeBtn from './components/ThemeBtn';
 
-function App() {
-  const [todos, setTodos] = useState([])
+const App = () => {
+  const [todos, setTodos] = useState([]);
+  const [themeMode, setThemeMode] = useState('dark');
+
+  const darkTheme = () => {
+    setThemeMode('dark');
+  };
+
+  const lightTheme = () => {
+    setThemeMode('light');
+  };
+
+  useEffect(() => {
+    document.querySelector('html').classList.remove('light', 'dark');
+    document.querySelector('html').classList.add(themeMode);
+  }, [themeMode]);
 
   const addTodo = (todo) => {
-    setTodos( (prev) => [{id: Date.now(), ...todo}, ...prev] )
-  }
+    setTodos((prev) => [{ id: Date.now(), ...todo }, ...prev]);
+  };
 
   const updateTodo = (id, todo) => {
-    setTodos( (prev) => prev.map((prevTodo) => (prevTodo.id === id ? todo : prevTodo )))
-  }
+    setTodos((prev) => prev.map((prevTodo) => (prevTodo.id === id ? todo : prevTodo)));
+  };
 
   const deleteTodo = (id) => {
-    setTodos( (prev) => prev.filter((prevTodo) => prevTodo.id !== id) )
-  }
+    setTodos((prev) => prev.filter((prevTodo) => prevTodo.id !== id));
+  };
 
   const toggleComplete = (id) => {
-    setTodos( (prev) => prev.map( (prevTodo) => prevTodo.id === id ? {...prev , isCompleted: !prevTodo.isCompleted} : prevTodo ))
-  }
+    setTodos((prev) =>
+      prev.map((prevTodo) =>
+        prevTodo.id === id ? { ...prevTodo, isCompleted: !prevTodo.isCompleted } : prevTodo
+      )
+    );
+  };
 
   useEffect(() => {
-    const todos = JSON.parse(localStorage.getItem("todos"))
+    const storedTodos = JSON.parse(localStorage.getItem('todos'));
 
-    if(todos && todos.length > 0) {
-      setTodos(todos) 
+    if (storedTodos && storedTodos.length > 0) {
+      setTodos(storedTodos);
     }
-  }, [])
+  }, []);
 
-
-  // Local Storage concept!
   useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos))
-  }, [todos])
-
-
+    localStorage.setItem('todos', JSON.stringify(todos));
+  }, [todos]);
 
   return (
-    <TodoProvider value={{todos, addTodo, deleteTodo, updateTodo, toggleComplete}}>
-      <div className="bg-[#172842] min-h-screen py-8">
-        <div className="w-full max-w-2xl mx-auto shadow-md rounded-lg px-4 py-3 text-white">
-          <h1 className="text-2xl font-bold text-center mb-8 mt-2">Manage Your Todos</h1>
-          <div className="mb-4">
-            {/* Todo form goes here */}
+    <ThemeProvider value={{ themeMode, darkTheme, lightTheme }}>
+      <TodoProvider value={{ todos, addTodo, deleteTodo, updateTodo, toggleComplete }}>
+        <div className={`min-h-screen py-8 ${themeMode === 'light' ? 'bg-gray-200 text-gray-1000' : 'bg-gray-900 text-gray-100'}`}>
+          <div className="w-full max-w-2xl mx-auto bg-gray-800 bg-opacity-75 shadow-md rounded-lg px-6 py-8">
+
+            {/* Place ThemeBtn component here */}
+            <div className="flex justify-end mb-4">
+              <ThemeBtn />
+            </div>
+
+            <h1 className="text-3xl font-bold text-center mb-8 text-gray-100">Manage Your Todos</h1>
             <TodoForm />
-          </div>
-          <div className="flex flex-wrap gap-y-3">
-            {/*Loop and Add TodoItem here */}
-            {todos.map((todo) => (
-              <div key={todo.id}
-                className="w-full"
-                >
-                  <TodoItem todo={todo} />    
-              </div>
-            ))}
+            <div className="mt-6">
+              {todos.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} />
+              ))}
+            </div>
           </div>
         </div>
-      </div>
-    </TodoProvider  >
-  )
-}
+      </TodoProvider>
+    </ThemeProvider>
+  );
+};
 
-export default App
+export default App;
